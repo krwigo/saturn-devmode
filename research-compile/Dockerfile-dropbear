@@ -1,5 +1,5 @@
 # docker build -t cross-compile --file Dockerfile-dropbear .
-# docker run -it --rm -v $(pwd)/out:/out cross-compile
+# docker run -it --rm -v $(pwd):/out cross-compile
 
 FROM debian:13
 ENV DEBIAN_FRONTEND=noninteractive
