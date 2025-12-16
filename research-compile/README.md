@@ -146,6 +146,40 @@ Usage: ./bftpd [-h] [-v] [-i|-d|-D] [-c <filename>|-n]
 $ ./bftpd -d -c /path/to/bftpd.conf
 ```
 
+# python
+
+Static build with masl toolchain.
+
+```bash
+if [ ! -e /config/python3 ]
+then
+	ln -s $script_dir/python/usr/local/bin/python3 /config/python3
+fi
+```
+
+```bash
+$ telnet 192.168.1.2
+Trying 192.168.1.2...
+Connected to 192.168.1.2.
+Escape character is '^]'.
+
+(none) login: root
+Password:
+~:
+~: python3
+Python 3.12.3 (main, Dec 16 2025, 04:22:13) [GCC 9.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+>>> import os, sys, time
+>>> time.time()
+1765875904.0051734
+>>> os.listdir("/")
+['bin', 'dev', 'etc', 'lib', 'mnt', 'opt', 'run', 'tmp', 'sys', 'var', 'usr', 'proc', 'sbin', 'root', 'linuxrc', 'appconfigs', 'parameter', 'lib32', 'media', 'customer', 'config']
+>>> sys.path
+['', '/media/sda1/python/usr/local/lib/python312.zip', '/media/sda1/python/usr/local/lib/python3.12', '/media/sda1/python/usr/local/lib/python3.12/lib-dynload', '/media/sda1/python/usr/local/lib/python3.12/site-packages']
+>>>
+```
+
 # samba
 
 TODO:
