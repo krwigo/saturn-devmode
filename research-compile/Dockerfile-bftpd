@@ -7,8 +7,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /build
 
 RUN dpkg --add-architecture armhf && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
+    apt update && \
+    apt install -y --no-install-recommends \
     wget ca-certificates file \
     build-essential \
     crossbuild-essential-armhf \

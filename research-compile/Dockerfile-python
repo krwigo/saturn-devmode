@@ -1,0 +1,94 @@
+# docker build -t cross-compile --file Dockerfile-python .
+# docker run -it --rm -v $(pwd):/out cross-compile
+
+FROM debian:13
+ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /build
+
+RUN dpkg --add-architecture armhf && \
+    apt update && \
+    apt install -y --no-install-recommends \
+    wget ca-certificates file git xz-utils \
+    build-essential \
+    crossbuild-essential-armhf \
+    libc6-dev:armhf libc6-dev-armhf-cross \
+    libreadline-dev:armhf \
+    libbz2-dev:armhf \
+    libssl-dev:armhf \
+    libffi-dev:armhf \
+    zlib1g-dev:armhf \
+    zlib1g-dev
+
+# musl
+
+RUN git clone https://github.com/richfelker/musl-cross-make.git
+
+WORKDIR /build/musl-cross-make
+
+RUN printf '%s\n' \
+'TARGET = arm-linux-musleabihf' \
+'OUTPUT = /opt/musl' \
+'COMMON_CONFIG += CFLAGS="-O2"' \
+'COMMON_CONFIG += CXXFLAGS="-O2"' \
+'COMMON_CONFIG += LDFLAGS="-static"' \
+> config.mak
+
+RUN make -j$(nproc) && make install
+
+ENV PATH=/opt/musl/bin:$PATH
+ENV TARGET=arm-linux-musleabihf
+
+# native build
+
+WORKDIR /build
+
+COPY Python-3.12.3.tar.xz .
+RUN wget https://www.python.org/ftp/python/3.12.3/Python-3.12.3.tar.xz && \
+    tar -xJf Python-3.12.3.tar.xz
+
+WORKDIR /build/Python-3.12.3
+
+RUN ./configure
+RUN make -j$(nproc)
+RUN make install
+
+# arm build
+
+ENV CC="$TARGET-gcc"
+ENV CXX="$TARGET-g++"
+ENV AR="$TARGET-ar"
+ENV LD="$TARGET-ld"
+ENV AS="$TARGET-as"
+ENV RANLIB="$TARGET-ranlib"
+ENV STRIP="$TARGET-strip"
+
+ENV CFLAGS="-O2 -static -fPIC -fno-plt"
+ENV LDFLAGS="-static"
+
+RUN make distclean
+
+RUN cat << 'EOF' > Lib/sitecustomize.py
+import sys
+sys.path.append("/config/usr/local/lib/python3.12")
+EOF
+
+RUN ./configure \
+    --host=${TARGET} \
+    --build=x86_64-linux-gnu \
+    --disable-shared \
+    --without-ensurepip \
+    --enable-ipv6=no \
+    --with-build-python \
+    ac_cv_file__dev_ptmx=no \
+    ac_cv_file__dev_ptc=no \
+    ac_cv_func_dlopen=no \
+    ac_cv_lib_dl_dlopen=no
+
+RUN make -j$(nproc)
+
+RUN file python | grep -q 'statically linked'
+
+RUN make install DESTDIR=/tmp/python-arm-root
+
+CMD ["/bin/bash"]
