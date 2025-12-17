@@ -17,7 +17,8 @@ curl -sS --fail \
 	--data "machineId=${MACHINE_ID}" \
 	--data "version=${VERSION}" \
 	--data "lan=${LANG}" \
-	--data "firmwareType=${FIRMWARE_TYPE}"
+	--data "firmwareType=${FIRMWARE_TYPE}" \
+	--output "${VERSION}-${FIRMWARE_TYPE}.json"
 ```
 
 ```json

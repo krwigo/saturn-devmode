@@ -230,3 +230,69 @@ Mem:         116.3M       36.6M       54.5M       12.0K       25.2M       74.4M
 Swap:             0           0           0
 ~:
 ```
+
+# Saturn 4 Ultra 16K-V1.5.0-20251202
+
+```bash
+$ ./tool.py ChituUpgrade.bin --extract --shadow --startup --build
+cis.es: offset=0x4000 len=0x5608 crc32_full=06f8b203 payload_len=0x5600 tail_hex=ab98586c calc=ab98586c match=True
+cis.es: offset=0xA000 len=0x208 crc32_full=7bd4ba1c payload_len=0x200 tail_hex=a8682bd4 calc=a8682bd4 match=True
+ipl.es: offset=0xB000 len=0x5BE8 crc32_full=9d248907 payload_len=0x5BE0 tail_hex=41217aa3 calc=41217aa3 match=True
+ipl_cust.es: offset=0x11000 len=0x5368 crc32_full=2a34916d payload_len=0x5360 tail_hex=9e64ef7b calc=9e64ef7b match=True
+uboot.es: offset=0x17000 len=0x3D084 crc32_full=04946835 payload_len=0x3D07C tail_hex=d5a6f527 calc=d5a6f527 match=True
+logo.es: offset=0x55000 len=0xDF04 crc32_full=2e3500c4 payload_len=0xDEFC tail_hex=6e833820 calc=6e833820 match=True
+kernel.es: offset=0x63000 len=0x1FC1A4 crc32_full=0d4809e6 payload_len=0x1FC19C tail_hex=3175ad12 calc=3175ad12 match=True
+rootfs.es: offset=0x260000 len=0x1FF8008 crc32_full=d579b32f payload_len=0x1FF8000 tail_hex=0c0bcd58 calc=0c0bcd58 match=True
+miservice.es: offset=0x2259000 len=0xA6A008 crc32_full=88c2dfaf payload_len=0xA6A000 tail_hex=b4ae0b82 calc=b4ae0b82 match=True
+customer.es: offset=0x2CC4000 len=0x1C56008 crc32_full=8ce1b1ed payload_len=0x1C56000 tail_hex=d4259ea9 calc=d4259ea9 match=True
+appconfigs.es: offset=0x491B000 len=0x193008 crc32_full=e7180615 payload_len=0x193000 tail_hex=8c48d6af calc=8c48d6af match=True
+parameter.es: offset=0x4AAF000 len=0x193008 crc32_full=70e94dab payload_len=0x193000 tail_hex=86086783 calc=86086783 match=True
+patched shadow partition_00260000_01FF8008.bin
+patched startup partition_00260000_01FF8008.bin
+rebuilt ASCII CRC for partition_00004000_00005608.bin: ab98586c
+rebuilt ASCII CRC for partition_0000A000_00000208.bin: a8682bd4
+rebuilt ASCII CRC for partition_0000B000_00005BE8.bin: 41217aa3
+rebuilt ASCII CRC for partition_00011000_00005368.bin: 9e64ef7b
+rebuilt ASCII CRC for partition_00017000_0003D084.bin: d5a6f527
+rebuilt ASCII CRC for partition_00055000_0000DF04.bin: 6e833820
+rebuilt ASCII CRC for partition_00063000_001FC1A4.bin: 3175ad12
+rebuilt ASCII CRC for partition_00260000_01FF8008.bin: 13278f64
+rebuilt ASCII CRC for partition_02259000_00A6A008.bin: b4ae0b82
+rebuilt ASCII CRC for partition_02CC4000_01C56008.bin: d4259ea9
+rebuilt ASCII CRC for partition_0491B000_00193008.bin: 8c48d6af
+rebuilt ASCII CRC for partition_04AAF000_00193008.bin: 86086783
+wrote ChituUpgrade.patched.bin
+```
+
+# Saturn 4 Ultra 16K-V1.5.5-20251216
+
+```bash
+$ ./tool.py ChituUpgrade.bin --extract --shadow --startup --build
+cis.es: offset=0x4000 len=0x5608 crc32_full=06f8b203 payload_len=0x5600 tail_hex=ab98586c calc=ab98586c match=True
+cis.es: offset=0xA000 len=0x208 crc32_full=7bd4ba1c payload_len=0x200 tail_hex=a8682bd4 calc=a8682bd4 match=True
+ipl.es: offset=0xB000 len=0x5BE8 crc32_full=9d248907 payload_len=0x5BE0 tail_hex=41217aa3 calc=41217aa3 match=True
+ipl_cust.es: offset=0x11000 len=0x5368 crc32_full=2a34916d payload_len=0x5360 tail_hex=9e64ef7b calc=9e64ef7b match=True
+uboot.es: offset=0x17000 len=0x3D08C crc32_full=88be332e payload_len=0x3D084 tail_hex=16f74f61 calc=16f74f61 match=True
+logo.es: offset=0x55000 len=0xDF04 crc32_full=0b6eaae5 payload_len=0xDEFC tail_hex=f3f89ba4 calc=f3f89ba4 match=True
+kernel.es: offset=0x63000 len=0x1FC390 crc32_full=f1ddfbfe payload_len=0x1FC388 tail_hex=35ae32d9 calc=35ae32d9 match=True
+rootfs.es: offset=0x260000 len=0x1FF8008 crc32_full=005c48b2 payload_len=0x1FF8000 tail_hex=504e85d6 calc=504e85d6 match=True
+miservice.es: offset=0x2259000 len=0xA6A008 crc32_full=55e94fcc payload_len=0xA6A000 tail_hex=333b6992 calc=333b6992 match=True
+customer.es: offset=0x2CC4000 len=0x1C56008 crc32_full=7f721123 payload_len=0x1C56000 tail_hex=f772b038 calc=f772b038 match=True
+appconfigs.es: offset=0x491B000 len=0x193008 crc32_full=a3ae561d payload_len=0x193000 tail_hex=ba7c6f79 calc=ba7c6f79 match=True
+parameter.es: offset=0x4AAF000 len=0x193008 crc32_full=6fe1f1c4 payload_len=0x193000 tail_hex=2962b5ff calc=2962b5ff match=True
+patched shadow partition_00260000_01FF8008.bin
+patched startup partition_00260000_01FF8008.bin
+rebuilt ASCII CRC for partition_00004000_00005608.bin: ab98586c
+rebuilt ASCII CRC for partition_0000A000_00000208.bin: a8682bd4
+rebuilt ASCII CRC for partition_0000B000_00005BE8.bin: 41217aa3
+rebuilt ASCII CRC for partition_00011000_00005368.bin: 9e64ef7b
+rebuilt ASCII CRC for partition_00017000_0003D08C.bin: 16f74f61
+rebuilt ASCII CRC for partition_00055000_0000DF04.bin: f3f89ba4
+rebuilt ASCII CRC for partition_00063000_001FC390.bin: 35ae32d9
+rebuilt ASCII CRC for partition_00260000_01FF8008.bin: 4f62c7ea
+rebuilt ASCII CRC for partition_02259000_00A6A008.bin: 333b6992
+rebuilt ASCII CRC for partition_02CC4000_01C56008.bin: f772b038
+rebuilt ASCII CRC for partition_0491B000_00193008.bin: ba7c6f79
+rebuilt ASCII CRC for partition_04AAF000_00193008.bin: 2962b5ff
+wrote ChituUpgrade.patched.bin
+```
