@@ -231,6 +231,39 @@ Swap:             0           0           0
 ~:
 ```
 
+# Saturn 4 Ultra 16K-V1.2.9-20250214
+
+```bash
+$ ./tool.py ChituUpgrade.bin --extract --shadow --startup --build
+cis.es: offset=0x4000 len=0x5608 crc32_full=06f8b203 payload_len=0x5600 tail_hex=ab98586c calc=ab98586c match=True
+cis.es: offset=0xA000 len=0x208 crc32_full=7bd4ba1c payload_len=0x200 tail_hex=a8682bd4 calc=a8682bd4 match=True
+ipl.es: offset=0xB000 len=0x5BE8 crc32_full=9d248907 payload_len=0x5BE0 tail_hex=41217aa3 calc=41217aa3 match=True
+ipl_cust.es: offset=0x11000 len=0x5368 crc32_full=2a34916d payload_len=0x5360 tail_hex=9e64ef7b calc=9e64ef7b match=True
+uboot.es: offset=0x17000 len=0x3D03C crc32_full=2e5930ef payload_len=0x3D034 tail_hex=ff6c263a calc=ff6c263a match=True
+logo.es: offset=0x55000 len=0xDF04 crc32_full=13ac721f payload_len=0xDEFC tail_hex=b2513594 calc=b2513594 match=True
+kernel.es: offset=0x63000 len=0x1FC294 crc32_full=5b23d7c2 payload_len=0x1FC28C tail_hex=061dceec calc=061dceec match=True
+rootfs.es: offset=0x260000 len=0x1FF8008 crc32_full=b21fc9cd payload_len=0x1FF8000 tail_hex=0a139ecd calc=0a139ecd match=True
+miservice.es: offset=0x2259000 len=0x899008 crc32_full=2cda999f payload_len=0x899000 tail_hex=ec3fb37f calc=ec3fb37f match=True
+customer.es: offset=0x2AF3000 len=0x216C008 crc32_full=5fd7a394 payload_len=0x216C000 tail_hex=99dbe287 calc=99dbe287 match=True
+appconfigs.es: offset=0x4C60000 len=0x193008 crc32_full=2219f669 payload_len=0x193000 tail_hex=0a4a872f calc=0a4a872f match=True
+parameter.es: offset=0x4DF4000 len=0x193008 crc32_full=94d70c6a payload_len=0x193000 tail_hex=8f605078 calc=8f605078 match=True
+patched shadow partition_00260000_01FF8008.bin
+patched startup partition_00260000_01FF8008.bin
+rebuilt ASCII CRC for partition_00004000_00005608.bin: ab98586c
+rebuilt ASCII CRC for partition_0000A000_00000208.bin: a8682bd4
+rebuilt ASCII CRC for partition_0000B000_00005BE8.bin: 41217aa3
+rebuilt ASCII CRC for partition_00011000_00005368.bin: 9e64ef7b
+rebuilt ASCII CRC for partition_00017000_0003D03C.bin: ff6c263a
+rebuilt ASCII CRC for partition_00055000_0000DF04.bin: b2513594
+rebuilt ASCII CRC for partition_00063000_001FC294.bin: 061dceec
+rebuilt ASCII CRC for partition_00260000_01FF8008.bin: 153fdcf1
+rebuilt ASCII CRC for partition_02259000_00899008.bin: ec3fb37f
+rebuilt ASCII CRC for partition_02AF3000_0216C008.bin: 99dbe287
+rebuilt ASCII CRC for partition_04C60000_00193008.bin: 0a4a872f
+rebuilt ASCII CRC for partition_04DF4000_00193008.bin: 8f605078
+wrote ChituUpgrade.patched.bin
+```
+
 # Saturn 4 Ultra 16K-V1.5.0-20251202
 
 ```bash
