@@ -148,7 +148,24 @@ $ ./bftpd -d -c /path/to/bftpd.conf
 
 # python
 
-Static build with masl toolchain.
+The linked build adds support for glibc 2.8, ctypes, and sqlite.
+
+# Linked build
+
+```bash
+$ docker run --rm -it -v "$(pwd)":/build debian:buster
+$ bash /build/python-build.sh
+89M	/build/python-arm.zip
+```
+
+```bash
+$ ./python-test.py
+struct test: b'\x124Vx'
+ctypes strlen: 12
+sqlite rows: [(1, 'foo')]
+```
+
+# Static build
 
 ```bash
 if [ ! -e /config/python3 ]
