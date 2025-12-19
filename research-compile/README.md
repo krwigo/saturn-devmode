@@ -208,8 +208,16 @@ $ wget https://download.samba.org/pub/samba/samba-4.23.3.tar.gz
 
 # nano
 
-TODO:
+TODO: compiled successfully.
 
 ```bash
 $ wget https://www.nano-editor.org/dist/v8/nano-8.7.tar.xz
 ```
+
+# fsck.fat
+
+TODO:
+
+# avahi-daemon
+
+TODO:
