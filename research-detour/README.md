@@ -5,6 +5,44 @@ TODO:
 - improving function resume (flaky)
 - expose mcp server
 
+# Rev 4
+
+Added a plugin system with two initial plugins: debug and web. The debug plugin moves log message logic out of the main script. The web plugin creates a simple web server and returns the vat status.
+
+```
+11909.368290 using pid 726 for target /customer/resources/chitu
+11909.373547 loaded 28 entries, using 6 breakpoints, 31 watches, 3 watch_blocks
+11909.376332 PLUGIN plugin-debug.py loaded
+11909.386211 mem_reader=/proc/pid/mem
+11909.386823 INSTALL arm addr=0xae5b4 orig=0xe1200070 write=0xe1200070 read=0xe1200070 ok=True
+11909.387049 armed ota_get_info_AIC@0xae5b4 mode=arm
+11909.387423 INSTALL arm addr=0xae07c orig=0xe1200070 write=0xe1200070 read=0xe1200070 ok=True
+11909.387578 armed ota_get_info_request@0xae07c mode=arm
+11909.387884 INSTALL arm addr=0xb60f4 orig=0xe1200070 write=0xe1200070 read=0xe1200070 ok=True
+11909.388041 armed ota_time_check@0xb60f4 mode=arm
+11909.392445 PLUGIN plugin-debug.py axis {'axis': 0, 'label': 'Z', 'cur': None, 'target': 352000, 'delta': None, 'home': None, 'max': None, 'pct': None}
+11909.393272 PLUGIN plugin-debug.py axis {'axis': 1, 'label': 'X', 'cur': None, 'target': 0, 'delta': None, 'home': None, 'max': None, 'pct': None}
+11909.396133 PLUGIN plugin-debug.py printing_busy {'busy': 0}
+11909.396672 PLUGIN plugin-debug.py vat_temp {'temp_c': 21.067508697509766, 'online': None, 'state': None, 'control': None, 'flag': None, 'status': 'CHECK'}
+11909.945638 PLUGIN plugin-debug.py vat_temp {'temp_c': 21.070837020874023, 'online': 1, 'state': 0, 'control': 0, 'flag': 1, 'status': 'OK'}
+11910.571700 PLUGIN plugin-debug.py vat_temp {'temp_c': 21.069236755371094, 'online': 1, 'state': 0, 'control': 0, 'flag': 1, 'status': 'OK'}
+11911.189334 PLUGIN plugin-debug.py vat_temp {'temp_c': 21.069169998168945, 'online': 1, 'state': 0, 'control': 0, 'flag': 1, 'status': 'OK'}
+11911.690451 PLUGIN plugin-debug.py vat_temp {'temp_c': 21.06926727294922, 'online': 1, 'state': 0, 'control': 0, 'flag': 1, 'status': 'OK'}
+11912.203758 PLUGIN plugin-debug.py vat_temp {'temp_c': 21.070995330810547, 'online': 1, 'state': 0, 'control': 0, 'flag': 1, 'status': 'OK'}
+```
+
+```
+$ curl -s http://192.168.2.1:8000/api/vat_temp | jq
+{
+  "temp_c": 21.08944320678711,
+  "online": 1,
+  "state": 0,
+  "control": 0,
+  "flag": 1,
+  "status": "OK"
+}
+```
+
 # Rev 3
 
 Tested while the printer was idling after boot. Shows moving the plate Z axis 50 mm (`/movez 50`).
