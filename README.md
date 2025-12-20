@@ -1,6 +1,6 @@
 # Saturn Devmode
 
-A repository for research and tooling about the Elegoo Saturn 4 Ultra 16k 3d printer.
+A repository for research and tooling about the Elegoo Saturn 4 Ultra 16k 3d printer. Successfully accessing the Linux system, restoring programs, and hooking the application.
 
 # Research Update
 
@@ -27,4 +27,7 @@ A repository for research and tooling about the Elegoo Saturn 4 Ultra 16k 3d pri
 # Research Detour
 
 - Tracing the chitu binary for hooks.
-- Future research for return-to-home or video-recording.
+- Plugin system.
+  - Debug plugin: log messages.
+  - Web plugin: expose data.
+- Future research.
