@@ -1,0 +1,572 @@
+[
+  {
+    "name": "ota_get_info_AIC",
+    "address": "0xae5b4",
+    "anchor_string": "mainboardVersionUpdate",
+    "prototype": "void ota_get_info_AIC(void)",
+    "description": "Fetch OTA info JSON (mainboardVersionUpdate/getInfo.do7), parse package URL/hash/version/log/time, update ota_ctx, stime when provided."
+  },
+  {
+    "name": "printer_main_routine",
+    "address": "0x77364",
+    "mode": "arm",
+    "anchor_string": "printer_main_routine enter",
+    "prototype": "int printer_main_routine(int stop_flag, void *printer)",
+    "description": "Main printer thread loop; polls events, drives state machine, logs current printer->%s, sleeps 10ms."
+  },
+  {
+    "name": "printer_suspend_handler",
+    "address": "0x78278",
+    "mode": "arm",
+    "anchor_string": "suspend_state_handler PRINTER_EVENT_STOP",
+    "prototype": "int printer_suspend_handler(int printer, uint32_t *evt)",
+    "description": "Handles PRINTER_EVENT_SUSPEND/STOP; clears heat/axes, manages wait reasons, routes to CHECK/WAIT/STOP/print continue."
+  },
+  {
+    "name": "printer_heat_handler",
+    "address": "0x776D8",
+    "mode": "arm",
+    "anchor_string": "printer->skips%d",
+    "prototype": "int printer_heat_handler(int printer, uint32_t *evt)",
+    "description": "HEAT state logic; starts/stops vat heater, transitions to LEVEL/WAIT/CHECK, sets wait_reason on heat faults."
+  },
+  {
+    "name": "printer_stopping_handler",
+    "address": "0x77D04",
+    "mode": "arm",
+    "anchor_string": "printer->wait_reason",
+    "prototype": "int printer_stopping_handler(int printer, uint32_t *evt)",
+    "description": "STOPPING state; stops axes, resets flags, handles endstop status, sets wait_reason and pause flags."
+  },
+  {
+    "name": "printer_stage1_handler",
+    "address": "0x79954",
+    "mode": "arm",
+    "anchor_string": "printer->options = %x",
+    "prototype": "int printer_stage1_handler(int printer, uint32_t *evt)",
+    "description": "STAGE1 processing; initial layer/pump setup, waits for endstop OK, moves into PRINT/WAIT paths."
+  },
+  {
+    "name": "printer_init",
+    "address": "0x7C9A0",
+    "mode": "arm",
+    "anchor_string": "printer file2 open failed",
+    "prototype": "void *printer_init(void *ctx, int flags, int mode)",
+    "description": "Allocates/initializes global printer struct, sets default layers/options, creates threads and state handlers."
+  },
+  {
+    "name": "printer_ui_handler",
+    "address": "0x433EC",
+    "mode": "arm",
+    "anchor_string": "rtm_printer_info status:",
+    "prototype": "int printer_ui_handler(void **widgets, int sender, int event)",
+    "description": "UI event handler for printer screen; reacts to start/stop/exit, toggles LCD elements, kicks printer state and preview uploads."
+  },
+  {
+    "name": "ota_get_info_request",
+    "address": "0xae07c",
+    "anchor_string": "mainboardVersionUpdate",
+    "prototype": "int ota_get_info_request(int idx)",
+    "description": "Kick off OTA info fetch thread for slot idx if not already in-progress; sets state flag."
+  },
+  {
+    "name": "get_ota_upgrade_filepath",
+    "address": "0xaee34",
+    "anchor_string": "ota_upgrade.zip",
+    "prototype": "int get_ota_upgrade_filepath(char *out, int out_len)",
+    "description": "Build path to ota_upgrade.zip using default mount point."
+  },
+  {
+    "name": "ota_time_check",
+    "address": "0xb60f4",
+    "mode": "arm",
+    "anchor_string": "getTimestamp.do7",
+    "prototype": "int ota_time_check(void)",
+    "description": "POST firmwareTimeCheck/getTimestamp.do7, sign request, apply timestamp via stime()."
+  },
+  {
+    "name": "app_ota_callback",
+    "address": "0x2d034",
+    "prototype": "int app_ota_callback(void *widgets, void *sender, void *event)",
+    "description": "OTA UI callback; handles OTA stages and button events."
+  },
+  {
+    "name": "axis_home",
+    "address": "0x19af8",
+    "mode": "arm",
+    "anchor_string": "axis_home(AXIS_Z)",
+    "disabled": true,
+    "prototype": "int axis_home(int axis)",
+    "description": "Homing routine; logs axis_home(AXIS_Z)/axis_home(AXIS_X)."
+  },
+  {
+    "name": "axis_move",
+    "address": "0x535ac",
+    "mode": "arm",
+    "anchor_string": "axis_move: index %d %f %f %d %d flag %x",
+    "step": true,
+    "disabled": true,
+    "prototype": "int axis_move(int index, float pos, float speed, int wait, int flags, int extra)",
+    "description": "Axis move handler; logs axis_move with position/speed/flags."
+  },
+  {
+    "name": "stepper_move",
+    "address": "0x89c1c",
+    "mode": "arm",
+    "anchor_string": "stepper_move:index %d step %d speed %d wait %d",
+    "step": true,
+    "disabled": true,
+    "prototype": "int stepper_move(int index, int step, int speed, int wait)",
+    "description": "Low-level stepper move function."
+  },
+  {
+    "name": "axis_home_state",
+    "address": "0x53b5c",
+    "mode": "arm",
+    "anchor_string": "index %d homing_state %d home_succeed %d",
+    "disabled": true,
+    "prototype": "int axis_home_state_update(int index)",
+    "description": "Homing state/status updates."
+  },
+  {
+    "name": "axis_params_update",
+    "address": "0x54784",
+    "mode": "arm",
+    "anchor_string": "axis_params_updata",
+    "disabled": true,
+    "prototype": "int axis_params_update(int index)",
+    "description": "Axis params update on min/max stop."
+  },
+  {
+    "name": "axis_home_fail",
+    "address": "0x47d4c",
+    "mode": "arm",
+    "anchor_string": "home fail",
+    "disabled": true,
+    "prototype": "int axis_home_fail(int a, int b)",
+    "description": "Homing failure logging."
+  },
+  {
+    "name": "motor_home_fail",
+    "address": "0x1df54",
+    "mode": "arm",
+    "anchor_string": "motor home failed",
+    "prototype": "int motor_home_fail(int axis)",
+    "description": "Motor home failed logging."
+  },
+  {
+    "name": "axis_endstop_enable",
+    "address": "0x532fc",
+    "mode": "arm",
+    "anchor_string": "axis_endstop_enable",
+    "disabled": true,
+    "prototype": "int axis_endstop_enable(int axis, int endstop, int enable)",
+    "description": "Endstop enable/disable during homing/moves."
+  },
+  {
+    "name": "axis_handle",
+    "address": "0x53b5c",
+    "mode": "arm",
+    "anchor_string": "axis_handle: index %d",
+    "disabled": true,
+    "prototype": "int axis_handle(int index)",
+    "description": "Axis state machine; handles homing and move state."
+  },
+  {
+    "name": "axis_handle_target",
+    "address": "0x54f64",
+    "mode": "arm",
+    "anchor_string": "axis_handle: index %d constant->target_position_in_step",
+    "disabled": true,
+    "prototype": "int axis_handle_target(int index)",
+    "description": "Axis handle target position update."
+  },
+  {
+    "name": "axis_ui_home_path",
+    "address": "0x105234",
+    "mode": "arm",
+    "disabled": true,
+    "prototype": "int axis_ui_home_path(void)",
+    "description": "UI/state handler seen around home operations (sub_105234)."
+  },
+  {
+    "name": "axis_ui_home_path_a",
+    "address": "0x105b68",
+    "mode": "arm",
+    "disabled": true,
+    "prototype": "int axis_ui_home_path_a(void)",
+    "description": "Hot path during home UI (offset +0x934 in sub_105234)."
+  },
+  {
+    "name": "axis_ui_home_path_b",
+    "address": "0x1063c4",
+    "mode": "arm",
+    "disabled": true,
+    "prototype": "int axis_ui_home_path_b(void)",
+    "description": "Hot path during home UI (offset +0x1190 in sub_105234)."
+  },
+  {
+    "name": "axis_target_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 0,
+    "offset": "0x50",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 0 target_position_in_step (struct +0x50)."
+  },
+  {
+    "name": "axis_target_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 1,
+    "offset": "0x50",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 1 target_position_in_step (struct +0x50)."
+  },
+  {
+    "name": "axis_target_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 2,
+    "offset": "0x50",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 2 target_position_in_step (struct +0x50)."
+  },
+  {
+    "name": "axis_current_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 0,
+    "offset": "0x4C",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 0 current_position_in_step (struct +0x4C)."
+  },
+  {
+    "name": "axis_current_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 1,
+    "offset": "0x4C",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 1 current_position_in_step (struct +0x4C)."
+  },
+  {
+    "name": "axis_current_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 2,
+    "offset": "0x4C",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 2 current_position_in_step (struct +0x4C)."
+  },
+  {
+    "name": "axis_remaining_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 0,
+    "offset": "0x54",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 0 remaining_step (struct +0x54)."
+  },
+  {
+    "name": "axis_remaining_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 1,
+    "offset": "0x54",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 1 remaining_step (struct +0x54)."
+  },
+  {
+    "name": "axis_remaining_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 2,
+    "offset": "0x54",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 2 remaining_step (struct +0x54)."
+  },
+  {
+    "name": "printing_level_mode",
+    "watch": true,
+    "base": "0x2FDA90",
+    "index": 0,
+    "offset": "0x30",
+    "kind": "u8",
+    "size": 1,
+    "description": "rotate_param->printing_level_mode (byte at +0x30 via dword_2FDA90 pointer)."
+  },
+  {
+    "name": "printing_sync_mode",
+    "watch": true,
+    "base": "0x2FDA90",
+    "index": 0,
+    "offset": "0x31",
+    "kind": "u8",
+    "size": 1,
+    "description": "rotate_param->sync_mode (byte at +0x31 via dword_2FDA90 pointer)."
+  },
+  {
+    "name": "lattice_busy",
+    "watch": true,
+    "abs": true,
+    "base": "0x2FECB8",
+    "index": 0,
+    "offset": "0x0",
+    "kind": "u8",
+    "size": 1,
+    "description": "byte_2FECB8 set when lattice busy flag is detected."
+  },
+  {
+    "name": "tank_temp_c",
+    "watch": true,
+    "abs": true,
+    "base": "0x2FED3C",
+    "index": 0,
+    "offset": "0x0",
+    "kind": "f32",
+    "size": 4,
+    "description": "flt_2FED3C averaged tank/vat temperature (C)."
+  },
+  {
+    "name": "tank_temp_online",
+    "watch": true,
+    "abs": true,
+    "base": "0x2FED38",
+    "index": 0,
+    "offset": "0x0",
+    "kind": "u32",
+    "size": 4,
+    "description": "dword_2FED38[0] online status for tank temp sensor."
+  },
+  {
+    "name": "tank_heat_state",
+    "watch": true,
+    "abs": true,
+    "base": "0x2FEE4C",
+    "index": 0,
+    "offset": "0x0",
+    "kind": "u32",
+    "size": 4,
+    "description": "dword_2FEE4C tank heat state."
+  },
+  {
+    "name": "tank_heat_control",
+    "watch": true,
+    "abs": true,
+    "base": "0x2FEE54",
+    "index": 0,
+    "offset": "0x0",
+    "kind": "u32",
+    "size": 4,
+    "description": "dword_2FEE54 tank heat control flag."
+  },
+  {
+    "name": "tank_temp_flag",
+    "watch": true,
+    "abs": true,
+    "base": "0x2FEE50",
+    "index": 0,
+    "offset": "0x0",
+    "kind": "u8",
+    "size": 1,
+    "description": "byte_2FEE50 sensor online flag."
+  },
+  {
+    "name": "axis_max_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 0,
+    "offset": "0x3C",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 0 max_position_in_step (struct +0x3C)."
+  },
+  {
+    "name": "axis_max_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 1,
+    "offset": "0x3C",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 1 max_position_in_step (struct +0x3C)."
+  },
+  {
+    "name": "axis_max_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 2,
+    "offset": "0x3C",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 2 max_position_in_step (struct +0x3C)."
+  },
+  {
+    "name": "axis_zero_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 0,
+    "offset": "0x40",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 0 zero_position_in_step (struct +0x40)."
+  },
+  {
+    "name": "axis_zero_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 1,
+    "offset": "0x40",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 1 zero_position_in_step (struct +0x40)."
+  },
+  {
+    "name": "axis_zero_position_in_step",
+    "watch": true,
+    "base": "0x2FA124",
+    "index": 2,
+    "offset": "0x40",
+    "kind": "s32",
+    "size": 4,
+    "description": "Axis 2 zero_position_in_step (struct +0x40)."
+  },
+  {
+    "name": "axis_struct",
+    "watch_block": true,
+    "base": "0x2FA124",
+    "index": 0,
+    "size": 288,
+    "description": "Axis 0 struct block scan for changes."
+  },
+  {
+    "name": "axis_struct",
+    "watch_block": true,
+    "base": "0x2FA124",
+    "index": 1,
+    "size": 288,
+    "description": "Axis 1 struct block scan for changes."
+  },
+  {
+    "name": "axis_struct",
+    "watch_block": true,
+    "base": "0x2FA124",
+    "index": 2,
+    "size": 288,
+    "description": "Axis 2 struct block scan for changes."
+  },
+  {
+    "name": "printer_state",
+    "watch": true,
+    "base": "0x2EB6D8",
+    "index": 0,
+    "offset": "0x2B8",
+    "kind": "s32",
+    "size": 4,
+    "description": "printer->state current stage (IDLE/HOME/CALIBRATE/PROBE/LEVEL/WAIT/CHECK/STAGE1/STAGE2/STAGE3/SUSPEND/PAUSING/STOPPING/HEAT)."
+  },
+  {
+    "name": "printer_event_code",
+    "watch": true,
+    "base": "0x2EB6D8",
+    "index": 0,
+    "offset": "0x2B0",
+    "kind": "s32",
+    "size": 4,
+    "description": "printer->event_code / last result used when transitioning state machine (set before state updates)."
+  },
+  {
+    "name": "printer_wait_reason",
+    "watch": true,
+    "base": "0x2EB6D8",
+    "index": 0,
+    "offset": "0x374",
+    "kind": "s32",
+    "size": 4,
+    "description": "printer->wait_reason logged on stop/suspend (codes: heat/probe/level/print wait etc)."
+  },
+  {
+    "name": "printer_options",
+    "watch": true,
+    "base": "0x2EB6D8",
+    "index": 0,
+    "offset": "0x2A8",
+    "kind": "u32",
+    "size": 4,
+    "description": "printer->options bitfield (layer/start behavior; bit 3 controls STAGE routing)."
+  },
+  {
+    "name": "printer_current_layer",
+    "watch": true,
+    "base": "0x2EB6D8",
+    "index": 0,
+    "offset": "0x2AC",
+    "kind": "s32",
+    "size": 4,
+    "description": "printer->layer/current_layer index tracked during print."
+  },
+  {
+    "name": "printer_heat_stage",
+    "watch": true,
+    "base": "0x2EB6D8",
+    "index": 0,
+    "offset": "0x2BC",
+    "kind": "s32",
+    "size": 4,
+    "description": "printer->heat_state used by HEAT state handler (0=idle,1=heating,2=done,4=cooldown)."
+  },
+  {
+    "name": "printer_skip_mask",
+    "watch": true,
+    "base": "0x2EB6D8",
+    "index": 0,
+    "offset": "0x37C",
+    "kind": "u32",
+    "size": 4,
+    "description": "printer->skips mask (bit flags for skipping calibrate/probe/level/heat)."
+  },
+  {
+    "name": "printer_pause_flags",
+    "watch": true,
+    "base": "0x2EB6D8",
+    "index": 0,
+    "offset": "0x3A0",
+    "kind": "u32",
+    "size": 4,
+    "description": "printer->pause_mask clears on resume (bits set when paused for probe/level/heat/print)."
+  },
+  {
+    "name": "cmd_hook_printer_loop",
+    "address": "0x7744c",
+    "mode": "arm",
+    "cmd_hook": true,
+    "prototype": "void cmd_hook_printer_loop(void)",
+    "description": "printer_main_routine loop hook at usleep inside the idle loop for command injection."
+  },
+  {
+    "name": "cmd_hook_ui_loop",
+    "address": "0x365ac",
+    "mode": "arm",
+    "cmd_hook": true,
+    "prototype": "void cmd_hook_ui_loop(void)",
+    "description": "Main UI/event loop hook (sub_365AC) to catch commands when printer thread is not running."
+  },
+  {
+    "name": "cmd_hook_temp_loop",
+    "address": "0x89e14",
+    "mode": "arm",
+    "cmd_hook": true,
+    "prototype": "void cmd_hook_temp_loop(void)",
+    "description": "Tank temperature thread loop (sub_89DD0) hook at loop start for guaranteed command injection while idle. Use cautiously for motion."
+  }
+]
