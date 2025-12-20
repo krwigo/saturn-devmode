@@ -136,7 +136,7 @@ Tested while the printer was idling after boot. Shows moving the plate Z axis 50
 ## /home
 
 - CMD home axis=0 correctly calls 0x53548 (reset/stop) then 0x53704 (home). That's the same path the UI uses.
-- The huge target=907235 while max=368000 is expected: homing runs a long endstop seek move with flag 0xD, so it doesn't clamp to max — it keeps moving until the endstop triggers. That's the long stretch of delta=-13300 chunks as cur rises toward the top.
+- The huge target=907235 while max=368000 is expected: homing runs a long endstop seek move with flag 0xD, so it doesn't clamp to max - it keeps moving until the endstop triggers. That's the long stretch of delta=-13300 chunks as cur rises toward the top.
 - The target=360000 segment is the backoff/slow re‑home pass; it reverses and finishes near the top. You can see the smaller steps and the final settle around 360000.
 - The later target=1096000 with delta=2700 looks like the final slow creep/settle phase, again using endstop logic, so the target can be “virtual” and beyond max while the endstop controls the stop.
 
