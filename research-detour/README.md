@@ -1,9 +1,6 @@
 # Detour Notes
 
-TODO:
-
-- improving function resume (flaky)
-- expose mcp server
+Research was moved to the devmode directory after successful testing.
 
 # Rev 4
 

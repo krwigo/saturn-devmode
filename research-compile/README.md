@@ -34,6 +34,30 @@ $ echo $PATH
 /bin:/sbin:/usr/bin:/usr/sbin:/config
 ```
 
+# build
+
+See the [build.sh](build.sh) script which outputs a zip file containing python3, nano, samba4, avahi, and screen. All have been tested except for avahi as nmbd was sufficient advertisement.
+
+```bash
+$ docker run --rm -it -v "$(pwd)":/build -w /build debian:buster
+```
+
+```bash
+$ bash build.sh
+```
+
+Copy out.zip to the USB drive (eg., /media/sda1/system/) and unzip (eg., unzip -o out.zip). A few exports are necessary for the programs to locate libraries. The exports can be added to the /etc/profile file used by `ash`.
+
+```bash
+$ export PATH=$PATH:/media/sda1/system/usr/local/bin:/media/sda1/system/usr/local/sbin
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/media/sda1/system/usr/local/lib
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/media/sda1/system/usr/local/lib/samba
+$ export TERM=xterm-256color
+$ export TERMINFO=/media/sda1/system/usr/local/share/terminfo
+```
+
+# archives
+
 Everything below was performed in a debian:13 trixie docker container.
 
 ```bash
@@ -46,7 +70,7 @@ CC="$TARGET-gcc"
 CXX="$TARGET-g++"
 ```
 
-# dropbear
+## dropbear
 
 ```bash
 $ wget https://matt.ucc.asn.au/dropbear/releases/dropbear-2025.88.tar.bz2 && \
@@ -95,7 +119,7 @@ $ ./dropbearkey -t rsa -f /path/to/dropbear_rsa_host_key
 $ ./dropbear -r /path/to/dropbear_rsa_host_key -p 0.0.0.0:22 -E
 ```
 
-# bftpd
+## bftpd
 
 ```bash
 $ wget https://downloads.sourceforge.net/project/bftpd/bftpd/bftpd-6.3/bftpd-6.3.tar.gz && \
@@ -146,78 +170,6 @@ Usage: ./bftpd [-h] [-v] [-i|-d|-D] [-c <filename>|-n]
 $ ./bftpd -d -c /path/to/bftpd.conf
 ```
 
-# python
-
-The linked build adds support for glibc 2.8, ctypes, and sqlite.
-
-# Linked build
-
-```bash
-$ docker run --rm -it -v "$(pwd)":/build debian:buster
-$ bash /build/python-build.sh
-89M	/build/python-arm.zip
-```
-
-```bash
-$ ./python-test.py
-struct test: b'\x124Vx'
-ctypes strlen: 12
-sqlite rows: [(1, 'foo')]
-```
-
-# Static build
-
-```bash
-if [ ! -e /config/python3 ]
-then
-	ln -s $script_dir/python/usr/local/bin/python3 /config/python3
-fi
-```
-
-```bash
-$ telnet 192.168.1.2
-Trying 192.168.1.2...
-Connected to 192.168.1.2.
-Escape character is '^]'.
-
-(none) login: root
-Password:
-~:
-~: python3
-Python 3.12.3 (main, Dec 16 2025, 04:22:13) [GCC 9.4.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>>
->>> import os, sys, time
->>> time.time()
-1765875904.0051734
->>> os.listdir("/")
-['bin', 'dev', 'etc', 'lib', 'mnt', 'opt', 'run', 'tmp', 'sys', 'var', 'usr', 'proc', 'sbin', 'root', 'linuxrc', 'appconfigs', 'parameter', 'lib32', 'media', 'customer', 'config']
->>> sys.path
-['', '/media/sda1/python/usr/local/lib/python312.zip', '/media/sda1/python/usr/local/lib/python3.12', '/media/sda1/python/usr/local/lib/python3.12/lib-dynload', '/media/sda1/python/usr/local/lib/python3.12/site-packages']
->>>
-```
-
-# samba
-
-TODO:
-
-```bash
-$ wget https://download.samba.org/pub/samba/samba-3.6.25.tar.gz
-$ wget https://download.samba.org/pub/samba/samba-4.23.3.tar.gz
-```
-
-# nano
-
-TODO: compiled successfully.
-
-```bash
-$ wget https://www.nano-editor.org/dist/v8/nano-8.7.tar.xz
-```
-
-# fsck.fat
-
-TODO:
-
-# avahi-daemon
+## fsck.fat
 
 TODO:
