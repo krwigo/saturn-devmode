@@ -441,6 +441,11 @@ fi
 
 cd "bftpd" || exit 1
 
+./configure \
+  --host="${TARGET}" \
+  --build="x86_64-linux-gnu" \
+  --prefix="/usr/local"
+
 # CC="arm-linux-gnueabihf-gcc -static" \
 make --quiet -j"$(nproc)" || exit 1
 make --quiet install DESTDIR="/out" > /dev/null || exit 1
