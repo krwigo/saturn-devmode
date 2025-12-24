@@ -451,6 +451,55 @@ cd "bftpd" || exit 1
 make --quiet -j"$(nproc)" || exit 1
 make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
+## nmap arm
+
+# NMAPVER="7.98"
+# 
+# cd "$WORKDIR"
+# 
+# if [ ! -e "nmap-7.98.tar.bz2" ]; then
+#   wget "https://nmap.org/dist/nmap-7.98.tar.bz2" -O "nmap-7.98.tar.bz2"
+# fi
+# 
+# if [ ! -d "nmap-7.98" ]; then
+#   tar -xjf "nmap-7.98.tar.bz2"
+# fi
+# 
+# cd "nmap-7.98" || exit 1
+# 
+# ./configure \
+#   --host="${TARGET}" \
+#   --build="x86_64-linux-gnu" \
+#   --prefix="/usr/local" \
+#   --disable-dbus
+# 
+# make --quiet -j"$(nproc)" || exit 1
+# make --quiet install DESTDIR="/out" > /dev/null || exit 1
+
+## socat arm
+
+# SOCATVER="1.8.1.0"
+# 
+# cd "$WORKDIR"
+# 
+# if [ ! -e "socat-1.8.1.0.tar.gz" ]; then
+#   wget "http://www.dest-unreach.org/socat/download/socat-1.8.1.0.tar.gz" -O "socat-1.8.1.0.tar.gz"
+# fi
+# 
+# if [ ! -d "socat-1.8.1.0" ]; then
+#   tar -xjf "socat-1.8.1.0.tar.gz"
+# fi
+# 
+# cd "socat-1.8.1.0" || exit 1
+# 
+# ./configure \
+#   --host="${TARGET}" \
+#   --build="x86_64-linux-gnu" \
+#   --prefix="/usr/local"
+# 
+# make --quiet -j"$(nproc)" || exit 1
+# make --quiet install DESTDIR="/out" > /dev/null || exit 1
+
 ## output
 
 # copy missing terminfo.
