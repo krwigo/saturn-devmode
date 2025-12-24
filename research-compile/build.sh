@@ -115,7 +115,7 @@ apt -qq install -y \
   libacl1-dev:armhf \
   libattr1-dev:armhf
 
-# python source
+## python source
 
 PYTHONVER="3.12.3"
 
@@ -129,7 +129,7 @@ if [ ! -d "Python-${PYTHONVER}" ]; then
   tar -xf "Python-${PYTHONVER}.tar.xz"
 fi
 
-# python native
+## python native
 
 cd "$WORKDIR"
 
@@ -144,7 +144,7 @@ cd "Python-${PYTHONVER}-native" || exit 1
 make --quiet -j"$(nproc)" || exit 1
 make --quiet install > /dev/null || exit 1
 
-# python arm
+## python arm
 
 export TARGET="arm-linux-gnueabihf"
 export CC="${TARGET}-gcc"
@@ -186,7 +186,7 @@ _sqlite3 \
 EOF
 
 ./configure \
-  --host="$TARGET" \
+  --host="${TARGET}" \
   --build="x86_64-linux-gnu" \
   --prefix="/usr/local" \
   --disable-shared --disable-ipv6 \
@@ -197,7 +197,7 @@ EOF
 make --quiet -j"$(nproc)" || exit 1
 make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
-# screen arm
+## screen arm
 
 cd "$WORKDIR"
 
@@ -216,7 +216,7 @@ if [ ! -f "configure" ]; then
 fi
 
 CPPFLAGS="-I/usr/include/arm-linux-gnueabihf" ./configure \
-  --host="$TARGET" \
+  --host="${TARGET}" \
   --build="x86_64-linux-gnu" \
   --prefix="/usr/local" \
   --disable-pam > /dev/null
@@ -225,7 +225,7 @@ make --quiet -j"$(nproc)" || exit 1
 # make --quiet -j"$(nproc)" CFLAGS="-O2 -Wall -static" LIBS="-lncursesw -ltinfo" || exit 1
 make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
-# nano arm
+## nano arm
 
 NANOVER="8.7"
 
@@ -242,7 +242,7 @@ fi
 cd "nano-${NANOVER}" || exit 1
 
 ./configure \
-  --host="$TARGET" \
+  --host="${TARGET}" \
   --build="x86_64-linux-gnu" \
   --prefix="/usr/local" \
   --disable-nls > /dev/null
@@ -251,7 +251,7 @@ make --quiet -j"$(nproc)" || exit 1
 # make --quiet -j"$(nproc)" CFLAGS="-O2 -Wall -static" LIBS="-lncursesw -ltinfo" || exit 1
 make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
-# avahi arm
+## avahi arm
 
 cd "$WORKDIR"
 
@@ -268,7 +268,7 @@ if [ ! -f "configure" ]; then
 fi
 
 ./configure \
-  --host="$TARGET" \
+  --host="${TARGET}" \
   --build="x86_64-linux-gnu" \
   --prefix="/usr/local" \
   --with-distro=none \
@@ -296,7 +296,7 @@ make --quiet install DESTDIR="/out" > /dev/null || exit 1
 # enable-reflector=no
 # EOF
 
-# samba arm
+## samba arm
 
 SAMBAVER="4.12.15"
 
@@ -334,35 +334,118 @@ export PYTHON="/usr/bin/python3"
 make --quiet -j"$(nproc)" || exit 1
 make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
-cat << 'EOF' > /media/sda1/samba/smb.conf
-[global]
-workgroup = WORKGROUP
-netbios name = CHITU
-server role = standalone server
-security = user
-map to guest = Bad User
-guest account = root
-force user = root
-force group = root
-load printers = no
-disable spoolss = yes
-printing = bsd
-printcap name = /dev/null
-log level = 0
-log file = /dev/null
-pam password change = no
-[root]
-path = /
-read only = no
-guest ok = yes
-browseable = yes
-EOF
+# cat << 'EOF' > /media/sda1/samba/smb.conf
+# [global]
+# workgroup = WORKGROUP
+# netbios name = CHITU
+# server role = standalone server
+# security = user
+# map to guest = Bad User
+# guest account = root
+# force user = root
+# force group = root
+# load printers = no
+# disable spoolss = yes
+# printing = bsd
+# printcap name = /dev/null
+# log level = 0
+# log file = /dev/null
+# pam password change = no
+# [root]
+# path = /
+# read only = no
+# guest ok = yes
+# browseable = yes
+# EOF
 
-# /media/sda1/system/usr/local/sbin/nmbd --foreground --log-stdout --configfile=/media/sda1/samba/smb.conf --debuglevel=4 --no-process-group
-# /media/sda1/system/usr/local/sbin/nmbd --daemon --configfile=/media/sda1/samba/smb.conf --no-process-group
-# /media/sda1/system/usr/local/sbin/smbd --daemon --configfile=/media/sda1/samba/smb.conf --no-process-group
+# usr/local/sbin/nmbd --configfile=/media/sda1/samba/smb.conf --no-process-group --foreground --log-stdout --debuglevel=4
+# usr/local/sbin/nmbd --configfile=/media/sda1/samba/smb.conf --no-process-group --daemon
+# usr/local/sbin/smbd --configfile=/media/sda1/samba/smb.conf --no-process-group --daemon
 
-# output
+## dosfstools
+
+cd "$WORKDIR"
+
+if [ ! -d "dosfstools/.git" ]; then
+  git clone "https://github.com/dosfstools/dosfstools" "dosfstools"
+fi
+
+cd "dosfstools" || exit 1
+
+# git rev-parse HEAD
+git checkout --quiet "289a48b9cb5b3c589391d28aa2515c325c932c7a"
+
+if [ ! -f "configure" ]; then
+  ./autogen.sh
+fi
+
+./configure \
+  --build="x86_64-linux-gnu" \
+  --host="${TARGET}" \
+  --prefix=/usr/local \
+  --enable-compat-symlinks
+
+make --quiet -j"$(nproc)" || exit 1
+make --quiet install DESTDIR="/out" > /dev/null || exit 1
+
+## dropbear arm
+
+DROPBEARVER="2025.88"
+
+cd "$WORKDIR"
+
+if [ ! -e "dropbear-${DROPBEARVER}.tar.bz2" ]; then
+  wget "https://matt.ucc.asn.au/dropbear/releases/dropbear-${DROPBEARVER}.tar.bz2"
+fi
+
+if [ ! -d "dropbear-${DROPBEARVER}" ]; then
+  tar -xjf "dropbear-${DROPBEARVER}.tar.bz2"
+fi
+
+cd "dropbear-${DROPBEARVER}" || exit 1
+
+# cat << 'EOF' > localoptions.h
+# # define DROPBEAR_PATH_SSH_PROGRAM "/config/dbclient"
+# # define SFTPSERVER_PATH "/config/sftp-server"
+# # define DEFAULT_PATH "/bin:/sbin:/usr/bin:/usr/sbin:/config"
+# # define DEFAULT_ROOT_PATH "/usr/sbin:/usr/bin:/sbin:/bin:/config"
+# EOF
+
+unset CFLAGS CPPFLAGS LDFLAGS
+
+./configure \
+  --host="${TARGET}" \
+  --build="x86_64-linux-gnu" \
+  --disable-zlib \
+  --disable-pam \
+  --disable-lastlog \
+  --disable-utmp \
+  --disable-wtmp
+
+make --quiet -j"$(nproc)" PROGRAMS="dropbear dbclient dropbearkey scp" || exit 1
+make --quiet install DESTDIR="/out" > /dev/null || exit 1
+
+## bftpd arm
+
+BFTPDVER="6.3"
+
+cd "$WORKDIR"
+
+if [ ! -e "bftpd-${BFTPDVER}.tar.gz" ]; then
+  wget "https://downloads.sourceforge.net/project/bftpd/bftpd/bftpd-${BFTPDVER}/bftpd-${BFTPDVER}.tar.gz" -O "bftpd-${BFTPDVER}.tar.gz"
+fi
+
+if [ ! -d "bftpd" ]; then
+  tar -xf "bftpd-${BFTPDVER}.tar.gz"
+fi
+
+cd "bftpd" || exit 1
+
+# CC="arm-linux-gnueabihf-gcc -static" \
+make --quiet -j"$(nproc)" || exit 1
+make --quiet install DESTDIR="/out" > /dev/null || exit 1
+
+## output
 
 # copy missing terminfo.
 cp -av /lib/terminfo /out/usr/local/share/
@@ -373,9 +456,9 @@ cp -av /usr/lib/arm-linux-gnueabihf/. /lib/arm-linux-gnueabihf/. /out/usr/local/
 # adjust library symbolc links.
 cd /out/usr/local/lib && find . -type l | while read -r link; do
     target=$(readlink "$link")
-    case "$target" in
+    case "${TARGET}" in
         /lib/arm-linux-gnueabihf/*|/usr/lib/arm-linux-gnueabihf/*)
-            base=$(basename "$target")
+            base=$(basename "${TARGET}")
             ln -snf "$base" "$link"
             ;;
     esac
@@ -394,7 +477,7 @@ cd "/out" && zip -q -r "/build/out.zip" "usr"
 
 du -h /build/out.*
 
-# usage
+## usage
 
 # update the device paths (eg. /etc/profile).
 # export PATH=$PATH:/media/sda1/system/usr/local/bin:/media/sda1/system/usr/local/sbin
