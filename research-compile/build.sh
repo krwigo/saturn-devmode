@@ -277,7 +277,8 @@ fi
   --disable-libsystemd \
   --disable-python \
   --disable-mono \
-  --disable-manpages > /dev/null
+  --disable-manpages \
+  --disable-dbus > /dev/null
 
 make --quiet -j"$(nproc)" || exit 1
 make --quiet install DESTDIR="/out" > /dev/null || exit 1
