@@ -131,8 +131,15 @@ def ts():
 
 
 def out(msg):
+    line = f"{ts()} {msg}"
     try:
-        print(f"{ts()} {msg}", flush=True)
+        print(line, flush=True)
+        return
+    except Exception:
+        pass
+    try:
+        sys.stderr.write(line + "\n")
+        sys.stderr.flush()
     except Exception:
         pass
 
@@ -284,7 +291,10 @@ class PluginContext:
     def queue_cmd(self, cmd):
         if not cmd:
             return False
-        self._cmd_queue.append(cmd)
+        text = str(cmd).strip()
+        if not text or not text.startswith("/") or len(text) == 1:
+            return False
+        self._cmd_queue.append(text)
         return True
 
     @property
@@ -819,7 +829,11 @@ class Tracer:
         self.trap_last_log = {}
         self.trap_log_interval = 1.0
         self.cmd_hooks_armed = False
+        self.cmd_hook_last_attempt = 0.0
+        self.cmd_hook_retry = 0.5
         self.suppress_stop = set()
+        self.stop_requested = False
+        self.stop_reason = None
 
     def attach_all(self):
         for tid in list_tids(self.pid):
@@ -876,16 +890,34 @@ class Tracer:
             return
         if self.mem_tid is None:
             return
+        if enable:
+            now = time.monotonic()
+            if (now - self.cmd_hook_last_attempt) < self.cmd_hook_retry:
+                return
+            self.cmd_hook_last_attempt = now
         stopped = self.stop_tid(self.mem_tid)
         if enable:
+            if not stopped:
+                out("cmd_hook stop failed")
+                self.cmd_hooks_armed = False
+                return
+            ok_all = True
             for bp in self.cmd_hooks:
                 bp.meta.pop("disabled_runtime", None)
                 ok = install_breakpoint(self.mem_tid, bp)
+                ok_all = ok_all and ok
                 if ok:
                     out(f"armed {bp.label()} mode={'thumb' if bp.is_thumb else 'arm'}")
                 else:
                     out(f"install failed {bp.label()}")
-            self.cmd_hooks_armed = True
+            if ok_all:
+                self.cmd_hooks_armed = True
+            else:
+                for bp in self.cmd_hooks:
+                    bp.meta["disabled_runtime"] = True
+                    restore_breakpoint(self.mem_tid, bp)
+                self.cmd_hooks_armed = False
+                out("cmd_hook arm failed; will retry")
         else:
             for bp in self.cmd_hooks:
                 bp.meta["disabled_runtime"] = True
@@ -896,6 +928,11 @@ class Tracer:
 
     def continue_tid(self, tid, sig=0):
         ptrace_checked(PTRACE_CONT, tid, None, sig)
+
+    def request_stop(self, reason=None):
+        if not self.stop_requested:
+            self.stop_requested = True
+            self.stop_reason = reason or "requested"
 
     def handle_clone(self, tid):
         child = get_event_msg(tid)
@@ -1062,7 +1099,7 @@ class Tracer:
         if self.event_bus is not None:
             self.event_bus.emit(event_name, payload)
 
-    def handle_hit(self, tid, bp, pc, auto_continue=True):
+    def handle_hit(self, tid, bp, pc, auto_continue=True, rearm=True):
         proto = bp.meta.get("prototype") or ""
         addr_txt = color(f"BREAKPOINT_ADDR=0x{bp.addr:x}", "33")
         proto_txt = color(f"prototype=\"{proto}\"", "32")
@@ -1116,11 +1153,19 @@ class Tracer:
                     break
             if ok_step and temp_bp:
                 restore_breakpoint(tid, temp_bp)
-                ok_rearm = rearm_breakpoint(tid, bp)
+                if rearm:
+                    ok_rearm = rearm_breakpoint(tid, bp)
+                else:
+                    ok_rearm = True
                 set_pc_mode(tid, temp_bp.addr, hit_is_thumb)
             out(
                 "temp_step -> step=%s rearm=%s wait_r=%d wait_status=%d"
-                % ("True" if ok_step else "False", "True" if ok_rearm else "False", last_r, last_status)
+                % (
+                    "True" if ok_step else "False",
+                    "skip" if not rearm else ("True" if ok_rearm else "False"),
+                    last_r,
+                    last_status,
+                )
             )
         if not ok_step:
             if temp_bp:
@@ -1135,7 +1180,7 @@ class Tracer:
                 1 if ok_restore else 0,
                 1 if ok_pc else 0,
                 1 if ok_step else 0,
-                1 if ok_rearm else 0,
+                0 if not rearm else (1 if ok_rearm else 0),
                 tid,
                 pc,
             )
@@ -1148,6 +1193,9 @@ class Tracer:
         for tid in list(self.attached):
             self.continue_tid(tid)
         while self.attached:
+            if self.stop_requested:
+                out(f"stop requested: {self.stop_reason}")
+                break
             now = time.monotonic()
             self.poll_cmd_queue()
             self.poll_stdin_cmd()
@@ -1197,14 +1245,18 @@ class Tracer:
                         continue
                     for bp in self.bps:
                         if bp.meta.get("disabled_runtime") is True:
-                            continue
+                            if bp.meta.get("cmd_hook") is not True:
+                                continue
+                            if bp.orig_word is None and bp.orig_halfword is None:
+                                continue
                         if match_breakpoint(pc_val, bp):
                             bp_hit = bp
                             break
                 if bp_hit:
                     auto_cont = self.pending_cmd is None
-                    self.handle_hit(tid, bp_hit, pc_val, auto_continue=auto_cont)
-                    if self.pending_cmd:
+                    rearm = not (bp_hit.meta.get("cmd_hook") and not self.cmd_hooks_armed)
+                    self.handle_hit(tid, bp_hit, pc_val, auto_continue=auto_cont, rearm=rearm)
+                    if self.pending_cmd and bp_hit.meta.get("cmd_hook") and self.cmd_hooks_armed:
                         spec = self.parse_call_cmd(self.pending_cmd)
                         if spec is None:
                             out(f"CMD parse failed: {self.pending_cmd}")
@@ -1233,9 +1285,18 @@ class Tracer:
 
     def cleanup(self):
         if self.attached and self.bps:
-            restore_tid = next(iter(self.attached))
-            for bp in self.bps:
-                restore_breakpoint(restore_tid, bp)
+            restore_tid = self.mem_tid
+            if restore_tid is None or not self.stop_tid(restore_tid):
+                restore_tid = None
+                for tid in self.attached:
+                    if self.stop_tid(tid):
+                        restore_tid = tid
+                        break
+            if restore_tid is not None:
+                for bp in self.bps:
+                    ok = restore_breakpoint(restore_tid, bp)
+                    if not ok:
+                        out(f"restore failed {bp.label()}")
         detach_all(self.attached)
         if self.plugin_mgr is not None:
             self.plugin_mgr.unload_all()
@@ -1246,8 +1307,6 @@ class Tracer:
                 pass
 
     def poll_stdin_cmd(self):
-        if self.pending_cmd is not None:
-            return
         if not STDIN_NONBLOCK and not set_stdin_nonblock():
             return
         try:
@@ -1263,7 +1322,20 @@ class Tracer:
         if not line:
             return
         cmd = line.strip()
-        self.queue_cmd(cmd)
+        self.enqueue_cmd(cmd)
+
+    def enqueue_cmd(self, cmd):
+        if cmd is None:
+            return False
+        text = str(cmd).strip()
+        if not text:
+            return False
+        if not text.startswith("/") or len(text) == 1:
+            out(f"CMD ignored (missing /): {text}")
+            return False
+        self.cmd_queue.append(text)
+        out(f"CMD queued: {text}")
+        return True
 
     def queue_cmd(self, cmd):
         if self.pending_cmd is not None:
@@ -1598,6 +1670,14 @@ def main():
         plugin_mgr=plugin_mgr,
         cmd_queue=cmd_queue,
     )
+    def handle_signal(signum, _frame):
+        tracer.request_stop(f"signal {signum}")
+
+    for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGPIPE):
+        try:
+            signal.signal(sig, handle_signal)
+        except Exception:
+            pass
     if not tracer.attach_all():
         out("attach failed")
         return 1

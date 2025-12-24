@@ -12,7 +12,7 @@ def plugin_load(ctx):
         if status == 0:
             state["fired"] = False
         if status == PRINT_INFO_STATUS_DONE and not state["fired"]:
-            if ctx.queue_cmd("home"):
+            if ctx.queue_cmd("/home"):
                 ctx.log("queued home after print_info_status=9")
             state["fired"] = True
     ctx.on("printer", on_printer)
