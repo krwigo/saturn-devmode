@@ -500,6 +500,32 @@ cd "socat-${SOCATVER}" || exit 1
 make --quiet -j"$(nproc)" || exit 1
 make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
+## binutils arm
+
+# wget "https://ftp.gnu.org/gnu/binutils/binutils-2.45.1.tar.gz" -O "binutils-2.45.1.tar.gz"
+
+BINUTILSVER="2.45.1"
+
+cd "$WORKDIR"
+
+if [ ! -e "binutils-${BINUTILSVER}.tar.gz" ]; then
+  wget "https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILSVER}.tar.gz" -O "binutils-${BINUTILSVER}.tar.gz"
+fi
+
+if [ ! -d "binutils-${BINUTILSVER}" ]; then
+  tar -xjf "binutils-${BINUTILSVER}.tar.gz"
+fi
+
+cd "binutils-${BINUTILSVER}" || exit 1
+
+./configure \
+  --host="${TARGET}" \
+  --build="x86_64-linux-gnu" \
+  --prefix="/usr/local"
+
+make --quiet -j"$(nproc)" || exit 1
+make --quiet install DESTDIR="/out" > /dev/null || exit 1
+
 ## output
 
 # copy missing terminfo.
@@ -531,10 +557,10 @@ rm -rf \
 cd "/out" && zip -q -r "/build/out.zip" "usr"
 # cd "/out" && tar -chf "/build/out.tar" "usr"
 
-du -h /build/out.*
-
 # report
 find "/out/usr/local/bin/" "/out/usr/local/sbin/" "/out/usr/local/lib/" -type f -exec file "{}" + 2>&1 | grep ELF > /out/report.log
+
+du -h /build/out.*
 
 ## usage
 
