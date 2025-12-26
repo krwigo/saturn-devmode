@@ -113,7 +113,8 @@ apt -qq install -y \
   libkrb5-dev \
   libpam0g-dev:armhf \
   libacl1-dev:armhf \
-  libattr1-dev:armhf
+  libattr1-dev:armhf \
+  libssl-dev:armhf
 
 ## python source
 
@@ -417,7 +418,6 @@ unset CFLAGS CPPFLAGS LDFLAGS
 ./configure \
   --host="${TARGET}" \
   --build="x86_64-linux-gnu" \
-  --disable-zlib \
   --disable-pam \
   --disable-lastlog \
   --disable-utmp \
@@ -453,52 +453,52 @@ make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
 ## nmap arm
 
-# NMAPVER="7.98"
-# 
-# cd "$WORKDIR"
-# 
-# if [ ! -e "nmap-7.98.tar.bz2" ]; then
-#   wget "https://nmap.org/dist/nmap-7.98.tar.bz2" -O "nmap-7.98.tar.bz2"
-# fi
-# 
-# if [ ! -d "nmap-7.98" ]; then
-#   tar -xjf "nmap-7.98.tar.bz2"
-# fi
-# 
-# cd "nmap-7.98" || exit 1
-# 
-# ./configure \
-#   --host="${TARGET}" \
-#   --build="x86_64-linux-gnu" \
-#   --prefix="/usr/local" \
-#   --disable-dbus
-# 
-# make --quiet -j"$(nproc)" || exit 1
-# make --quiet install DESTDIR="/out" > /dev/null || exit 1
+NMAPVER="7.98"
+
+cd "$WORKDIR"
+
+if [ ! -e "nmap-${NMAPVER}.tar.bz2" ]; then
+  wget "https://nmap.org/dist/nmap-${NMAPVER}.tar.bz2" -O "nmap-${NMAPVER}.tar.bz2"
+fi
+
+if [ ! -d "nmap-${NMAPVER}" ]; then
+  tar -xjf "nmap-${NMAPVER}.tar.bz2"
+fi
+
+cd "nmap-${NMAPVER}" || exit 1
+
+./configure \
+  --host="${TARGET}" \
+  --build="x86_64-linux-gnu" \
+  --prefix="/usr/local" \
+  --disable-dbus
+
+make --quiet -j"$(nproc)" || exit 1
+make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
 ## socat arm
 
-# SOCATVER="1.8.1.0"
-# 
-# cd "$WORKDIR"
-# 
-# if [ ! -e "socat-1.8.1.0.tar.gz" ]; then
-#   wget "http://www.dest-unreach.org/socat/download/socat-1.8.1.0.tar.gz" -O "socat-1.8.1.0.tar.gz"
-# fi
-# 
-# if [ ! -d "socat-1.8.1.0" ]; then
-#   tar -xjf "socat-1.8.1.0.tar.gz"
-# fi
-# 
-# cd "socat-1.8.1.0" || exit 1
-# 
-# ./configure \
-#   --host="${TARGET}" \
-#   --build="x86_64-linux-gnu" \
-#   --prefix="/usr/local"
-# 
-# make --quiet -j"$(nproc)" || exit 1
-# make --quiet install DESTDIR="/out" > /dev/null || exit 1
+SOCATVER="1.8.1.0"
+
+cd "$WORKDIR"
+
+if [ ! -e "socat-${SOCATVER}.tar.gz" ]; then
+  wget "http://www.dest-unreach.org/socat/download/socat-${SOCATVER}.tar.gz" -O "socat-${SOCATVER}.tar.gz"
+fi
+
+if [ ! -d "socat-${SOCATVER}" ]; then
+  tar -xjf "socat-${SOCATVER}.tar.gz"
+fi
+
+cd "socat-${SOCATVER}" || exit 1
+
+./configure \
+  --host="${TARGET}" \
+  --build="x86_64-linux-gnu" \
+  --prefix="/usr/local"
+
+make --quiet -j"$(nproc)" || exit 1
+make --quiet install DESTDIR="/out" > /dev/null || exit 1
 
 ## output
 
@@ -524,13 +524,17 @@ rm -rf \
   "/out/usr/local/lib/python3.12/test" \
   "/out/usr/local/share/man" \
   "/build/out.zip" \
-  "/build/out.tar"
+  "/build/out.tar" \
+  "//out/report.log"
 
 # export as zip (cannot extract symbolic links).
 cd "/out" && zip -q -r "/build/out.zip" "usr"
 # cd "/out" && tar -chf "/build/out.tar" "usr"
 
 du -h /build/out.*
+
+# report
+find "/out/usr/local/bin/" "/out/usr/local/sbin/" "/out/usr/local/lib/" -type f -exec file "{}" + 2>&1 | grep ELF > /out/report.log
 
 ## usage
 
