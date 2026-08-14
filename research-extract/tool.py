@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import re, sys, zlib, struct
+import re, sys, zlib, struct, subprocess
 from pathlib import Path
 
 
@@ -55,6 +55,13 @@ def extract(bin_path, parts):
             calc, tail_val, ok, payload_len = tail
             tail_info = f" payload_len=0x{payload_len:X} tail_hex={tail_val:08x} calc={calc:08x} match={ok}"
         print(info + tail_info)
+        if "--extract-fs" in sys.argv:
+            cmd = ["ubireader_extract_files", "-o", f"{out}_fs", str(out)]
+            print(name, cmd)
+            try:
+                subprocess.run(cmd, check=True, text=True)
+            except Exception as ex:
+                print(name, ex)
 
 
 def rebuild(bin_path, parts, out_path):
@@ -83,13 +90,13 @@ def rebuild(bin_path, parts, out_path):
 
 def main():
     if len(sys.argv) < 2:
-        raise SystemExit("usage: ChituUpgrade.bin [--extract|--shadow|--startup|--build]")
+        raise SystemExit("usage: ChituUpgrade.bin [--extract|--extract-fs|--shadow|--startup|--build]")
     bin_path = sys.argv[1]
     parts = parse_header(bin_path)
     if not parts:
         raise SystemExit("no partitions")
 
-    if "--extract" in sys.argv:
+    if "--extract" in sys.argv or "--extract-fs" in sys.argv:
         extract(bin_path, parts)
 
     if "--shadow" in sys.argv:

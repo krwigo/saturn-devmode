@@ -70,6 +70,27 @@ $ head ubifs-root/etc/shadow
 root:$5$LWZE1Y5U$kQvhpcTMvhmcZdVZGPa2.yuOeUmtstssQBWWQRUDJ02:::::::
 ```
 
+Extract version string (eg., `V1.4.8B`) from chitu binary for the given device (eg., `Saturn 4 Ultra 16K`).
+
+```bash
+$ find -type f -name chitu -ls -exec sh -c '
+    readelf -p .rodata "$1" | grep -iE " v[0-9]+\.|Saturn"
+' _ {} \;
+```
+
+Notice the motherboard version 2 in `ELEGOO Saturn 4 Ultra 16K V2`.
+
+```
+  [  6f0c]  V1.4.8B
+  [  72c0]  Saturn 4 Ultra 16K
+  [  73c0]  Saturn 4 Ultra 16K
+  [  83c0]  ELEGOO SATURN 4 Ultra 16K
+  [ 6055c]  V1.4.8B
+  [ 666f8]  ELEGOO Saturn 4 Ultra 16K V2
+  [ 66dbc]  Saturn 4 Ultra 16K
+  [ 67d88]  V3.0.0
+```
+
 # --shadow
 
 Rather than building a new UBI partition, a known hash can be patched directly in the binary. The salt is specified to keep the new hash length consistent.
