@@ -53,6 +53,11 @@ Files matching the pattern `./plugin*.py` are registered early as extensible pyt
 
 - Historical logs of devmode printing objects.
 
+# Research Params
+
+- Increasing camera recording length.
+- Enabling recording below the minimum layer count.
+
 # Assets
 
 <img src="assets/RQ4B7QrzV9_1200x1600.png" width="300" />
